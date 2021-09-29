@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+    <head>
+    <br>
+    <br>
+
+    <title> Cadastrar Contatos - Pergamon</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <hr style="background: green"/>
+        <div>
+            <h1 style="color: blue">Cadastro de Usuário</h1>          
+        </div>
+        <hr style="background: green"/>
+
+        <div th:each="m: ${msg}">
+
+            <span th:text="${m}"></span>
+        </div>
+        <div>
+            <th:block th:include="messageValidation"></th:block>
+        </div>
+
+        <form th:object="${pessoa}"  th:action="@{/pessoa/salvar}"  method="POST">
+
+            <br>
+            <h4 style="color: green">Dados de Acesso</h4>
+
+            <div class="form-row border rounded">
+                <input th:field="*{idPessoa}" type="hidden" id="idPessoa"/>
+                <input th:field="*{cod_cliente}" type="hidden" id="idPessoa"/>
+                <div class="col-md-3 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="nome">Nome</label>
+                    <input th:field="*{lider}" type="text" class="form-control" id="lider" placeholder="Nome completo" />
+                </div>
+                <div class="col-md-3 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="login">Login</label>
+                    <input th:field="*{coordenador}" type="text" class="form-control" id="coordenador" placeholder="Login" />
+                </div>
+                <div class="col-md-3 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="senha">Senha</label>
+                    <input th:field="*{indicado_por}" type="password" class="form-control" id="indicado_por" placeholder="Senha" />
+                </div>
+
+
+                <div class="form-group col-md-2" style="margin-left: 10px; margin-top: 10px; margin-bottom: 10px">
+                    <label for="tipoDeUsuario">Tipo de Usuário</label>
+                    <select th:field="*{engajamento}" id="engajamento" class="form-control" data-placeholder="Escolher...">
+                        <option th:value="null" >Selecione</option>
+                        <option th:value="master" >Master</option>
+                        <option th:value="cadastrador">Cadastrador</option> 
+
+                    </select>
+                </div>
+            </div>
+            <hr/>
+            <div style="float: right">
+                <button class="btn btn-success" type="submit">Salvar</button>
+                <br/>
+                <br/>
+
+            </div>
+
+        </form>
+    </div>
+
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>

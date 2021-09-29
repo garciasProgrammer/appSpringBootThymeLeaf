@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+    <head>
+        <title> Listagem de Contatos - Pergamon</title>
+        <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    </head>
+
+    <body>
+        <form th:object="${pessoas}"  th:action="@{/pessoa/filtros}"  method="post">
+           
+
+            <div class="container">
+                <br/>
+                <br/>
+                <hr style="background: green"/>
+                <h1 style="color: blue">Listagem de Contatos - Pergamon</h1>
+                <hr style="background: green"/>
+
+
+                <h4 style="color: green">Pesquisa por Filtragem</h4>
+                <div class="form-row">
+
+                    <div class="col-md-3 mb-2" style="margin-top: 10px">
+                        <label for="nomeFiltro">Nome</label>
+                        <input type="text" class="form-control" id="nomePesquisa" name="nomePesquisado" placeholder="Nome Pesquisa" />
+                    </div>
+
+                    <div class="col-md-3 mb-2" style="margin-left: 10px; margin-top: 10px">
+                        <label for="coordenadorFiltro">Coordenador</label>
+                        <input  type="text" class="form-control" id="coordPesquisa" name="coordPesquisa" placeholder="Coordenador Pesquisa" />
+                    </div>
+
+                    <div class="form-group col-md-2" style="margin-left: 10px; margin-top: 10px; margin-bottom: 10px">
+                        <label for="engajamentoFiltro">Engajamento</label>
+                        <select  id="engajamento" class="form-control" name="engPesquisa" data-placeholder="Escolher...">
+
+                            <option th:value="null" >Todos</option>
+                            <option th:value="Positivo" >Positivo</option>
+                            <option th:value="Negativo">Negativo</option> 
+                            <option th:value="Neutro">Neutro</option> 
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 mb-2" style="margin-left: 10px; margin-top: 42px">
+                        <button class="btn btn-primary"  href="/pessoa/filtros">Filtrar</button>
+                        <a class="btn btn-success"  href="/pessoa/novo">Cadastrar</a>
+                    </div>
+
+
+
+                </div>
+
+                <hr style="background: green">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Coordenador</th>
+                            <th>Engajamento</th>
+
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    <th:block th:each="pessoa : ${pessoas}">
+                        <tr>
+                            <td th:text="${pessoa.nome}"></td>
+                            <td th:text="${pessoa.coordenador}"></td>
+                            <td th:text="${pessoa.engajamento}"></td>
+                            <td>
+                                <a class="btn btn-primary" th:href="@{'/pessoa/' + ${pessoa.idPessoa}+'/editar'}">Editar</a>
+                                <a class="btn btn-danger" th:onclick="'return confirm(\'Deseja excluir este contato?\')'" th:href="@{'/pessoa/' + ${pessoa.idPessoa}+'/excluir'}" href="#">Excluir</a>
+                            </td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+            </div>
+
+        </form>
+
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="/bootstrap/js/bootstrap.min.js"></script>
+    </body>
+</html>

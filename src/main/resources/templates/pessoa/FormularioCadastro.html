@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+    <head>
+    <br>
+    <br>
+
+    <title> Cadastrar Contatos - Pergamon</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+
+    <!-- Adicionando Javascript -->
+    <script>
+
+        function limpa_formulário_cep() {
+            //Limpa valores do formulário de cep.
+            document.getElementById('rua').value = ("");
+            document.getElementById('bairro').value = ("");
+            document.getElementById('cidade').value = ("");
+            document.getElementById('uf').value = ("");
+            document.getElementById('ibge').value = ("");
+        }
+
+        function meu_callback(conteudo) {
+            if (!("erro" in conteudo)) {
+                //Atualiza os campos com os valores.
+                document.getElementById('rua').value = (conteudo.logradouro);
+                document.getElementById('bairro').value = (conteudo.bairro);
+                 document.getElementById('bairroOficial').value = (conteudo.bairro);
+                document.getElementById('cidade').value = (conteudo.localidade);
+                
+            } //end if.
+            else {
+                //CEP não Encontrado.
+                limpa_formulário_cep();
+                alert("CEP não encontrado.");
+            }
+        }
+
+        function pesquisacep(valor) {
+
+            //Nova variável "cep" somente com dígitos.
+            var cep = valor.replace(/\D/g, '');
+
+            //Verifica se campo cep possui valor informado.
+            if (cep !== "") {
+
+                //Expressão regular para validar o CEP.
+                var validacep = /^[0-9]{8}$/;
+
+                //Valida o formato do CEP.
+                if (validacep.test(cep)) {
+
+                    //Preenche os campos com "..." enquanto consulta webservice.
+                    document.getElementById('rua').value = "...";
+                    document.getElementById('bairro').value = "...";
+                    document.getElementById('cidade').value = "...";
+                    document.getElementById('bairroOficial').value = "...";
+                   
+
+                    //Cria um elemento javascript.
+                    var script = document.createElement('script');
+
+                    //Sincroniza com o callback.
+                    script.src = 'https://viacep.com.br/ws/' + cep + '/json/?callback=meu_callback';
+
+                    //Insere script no documento e carrega o conteúdo.
+                    document.body.appendChild(script);
+
+                } //end if.
+                else {
+                    //cep é inválido.
+                    limpa_formulário_cep();
+                    alert("Formato de CEP inválido.");
+                }
+            } //end if.
+            else {
+                //cep sem valor, limpa formulário.
+                limpa_formulário_cep();
+            }
+        }
+        ;
+
+    </script>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <hr style="background: green"/>
+        <div>
+            <h1 style="color: blue">Cadastrar Contatos</h1>          
+        </div>
+        <hr style="background: green"/>
+
+        <div style="float: right">
+            <a class="btn btn-primary" href="/pessoa/listar">Voltar</a>  
+        </div>
+
+        <div th:each="m: ${msg}">
+
+            <span th:text="${m}"></span>
+        </div>
+        <div>
+            <th:block th:include="messageValidation"></th:block>
+        </div>
+
+        <form th:object="${pessoa}"  th:action="@{/pessoa/salvar}"  method="POST">
+
+            <br>
+            <h4 style="color: green">Dados Gerais</h4>
+
+            <div class="form-row border rounded">
+                <input th:field="*{idPessoa}" type="hidden" id="idPessoa"/>
+                <input th:field="*{cod_cliente}" type="hidden" id="idPessoa"/>
+                <div class="col-md-3 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="lider">Líder</label>
+                    <input th:field="*{lider}" type="text" class="form-control" id="lider" placeholder="Líder" />
+                </div>
+                <div class="col-md-3 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="coordenador">Coordenador</label>
+                    <input th:field="*{coordenador}" type="text" class="form-control" id="coordenador" placeholder="Coordenador" />
+                </div>
+                <div class="col-md-3 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="indicado_por">Indicado Por</label>
+                    <input th:field="*{indicado_por}" type="text" class="form-control" id="indicado_por" placeholder="Indicação" />
+                </div>
+                <div class="col-md-3 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="visitador_por">Visitado Por</label>
+                    <input th:field="*{visitado_por}" type="text" class="form-control" id="visitado_por" placeholder="Visitado Por" />
+                </div>
+
+                <div class="form-group col-md-2" style="margin-left: 10px; margin-top: 10px; margin-bottom: 10px">
+                    <label for="engajamento">Engajamento</label>
+                    <select th:field="*{engajamento}" id="engajamento" class="form-control" data-placeholder="Escolher...">
+                        <option th:value="null" ></option>
+                        <option th:value="Positivo" >Positivo</option>
+                        <option th:value="Negativo">Negativo</option> 
+                        <option th:value="Neutro">Neutro</option> 
+                    </select>
+                </div>
+                <div class="col-md-2 mb-2" style="margin-left: 10px; margin-top: 10px; margin-bottom: 10px">
+                    <label for="dataVisita">Data da Visita</label>
+                    <input th:field="*{data_da_visita}" type="date" class="form-control" id="email" placeholder="Data da Visita" />
+                </div>
+                <div class="col-md-2 mb-2" style="margin-left: 10px; margin-top: 10px; margin-bottom: 10px">
+                    <label for="estimativa_de_votos">Estimativa de Votos</label>
+                    <input th:field="*{estimativa_de_votos}" type="text" class="form-control" id="email" placeholder="Estimativa de votos" />
+                </div>
+                <div class="col-md-2 mb-2" style="margin-left: 10px; margin-top: 10px; margin-bottom: 10px">
+                    <label for="familia">Família</label>
+                    <input th:field="*{familia}" type="text" class="form-control" id="email" placeholder="Família" />
+                </div>
+            </div>
+            <hr/>
+            <h4 style="color: green">Dados Pessoais</h4>
+
+            <div class="form-row border rounded">
+                <div class="col-md-6 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="nome">Nome</label>
+                    <input th:field="*{nome}" type="text" class="form-control" id="nome" placeholder="Nome" />
+                </div>
+                <div class="col-md-2 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="cpf">Cpf</label>
+                    <input th:field="*{cpf}" type="text" class="form-control" id="email" placeholder="Cpf" />
+                </div>
+                <div class="col-md-2 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="Rg">Rg</label>
+                    <input th:field="*{rg}" type="text" class="form-control" id="email" placeholder="Rg" />
+                </div>
+
+                <div class="form-group col-md-2" style="margin-left: 10px; margin-top: 10px; margin-bottom: 10px">
+                    <label for="inputSexo">Sexo</label>
+                    <select th:field="*{sexo}" id="inputSexo" class="form-control" data-placehilder="Sexo">
+                        <option th:value="null"></option>
+                        <option th:value="Masculino">Masculino</option>
+                        <option th:value="Feminino">Feminino</option> 
+                    </select>
+                </div>
+                <div class="form-group col-md-3" style="margin-left: 10px; margin-top: 10px; margin-bottom: 10px">
+                    <label for="possuiCarro">Possui Veículo?</label>
+                    <select th:field="*{possui_veiculo}" id="inputPossuiVeiculo" class="form-control" data-placehilder="Possui veiculo">
+                        <option th:value="null"></option>
+                        <option th:value="Sim">Sim</option>
+                        <option th:value="Nao">Não</option> 
+                    </select>
+
+                </div>
+
+                <div class="col-md-4 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="tipoDeVeiculo">Tipo de Veículo?</label>
+                    <input th:field="*{tipo_de_Veiculo}" type="text" class="form-control" id="tipoDeVeiculo" placeholder="Tipo de Veículo" />
+                </div>
+                <div class="col-md-2 mb-2" style="margin-left: 10px; margin-top: 10px; margin-bottom: 10px">
+                    <label for="dataNascimento">Data de Nascimento</label>
+                    <input th:field="*{data_de_nascimento}" type="date" class="form-control" id="email" placeholder="Data de Nascimento" />
+                </div>
+                <div class="col-md-4 mb-2" style="margin-left: 10px; margin-top: 10px; margin-bottom: 10px">
+                    <label for="profissao">Profissão</label>
+                    <input th:field="*{profissao}" type="text" class="form-control" id="email" placeholder="Profissão" />
+                </div>
+                <div class="col-md-5 mb-2" style="margin-left: 10px; margin-top: 10px; margin-bottom: 10px">
+                    <label for="nomeDaMae">Nome da Mãe</label>
+                    <input th:field="*{nome_da_mae}" type="text" class="form-control" id="email" placeholder="Nome da Mãe" />
+                </div>
+                <div class="col-md-11 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="observacao">Observação</label>
+                    <input th:field="*{observacao}" type="text" class="form-control" id="tipoDeVeiculo" placeholder="Digite aqui..." />
+                </div>
+            </div>
+            <hr/>
+            <h4 style="color: green">Dados De Contato</h4>
+
+            <div class="form-row border rounded">
+
+                <div class="col-md-4 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="email">Email</label>
+                    <input th:field="*{email}" type="text" class="form-control" id="email" placeholder="Email" />
+                </div>
+                <div class="col-md-3 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="telefone">Telefone</label>
+                    <input th:field="*{telefone}" type="text" class="form-control" id="telefone" placeholder="Telefone" />
+                </div>
+                <div class="col-md-3 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="WhatsApp">Telefone WhatsApp</label>
+                    <input th:field="*{whatsapp}" type="text" class="form-control" id="telefone" placeholder="Telefone Whatsapp" />
+                </div>
+                <div class="col-md-3 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="Facebook">Facebook</label>
+                    <input th:field="*{facebook}" type="text" class="form-control" id="telefone" placeholder="Usuário Facebook" />
+                </div>
+                <div class="col-md-3 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="Instagram">Instagram</label>
+                    <input th:field="*{instagram}" type="text" class="form-control" id="telefone" placeholder="Usuário Instagram" />
+                </div>
+            </div>
+            <hr/>
+            <h4 style="color: green">Dados De Endereço</h4>
+            <div class="form-row border rounded">
+                 <div class="col-md-2 mb-2" style="margin-left: 10px; margin-top: 10px;">
+                    <label for="cep">CEP</label>
+                    <input th:field="*{cep}" name="cep" onblur="pesquisacep(this.value);" style="background: #d9f0f0" type="text" class="form-control" id="cep" value="" placeholder="CEP" />
+                </div>
+                <div class="col-md-4 mb-2 " style="margin-left: 10px; margin-top: 10px">
+                    <label for="Logradouro">Logradouro</label>
+                    <input th:field="*{endereco}" name="rua" type="text" class="form-control" id="rua" placeholder="Logradouro (rua,beco,trav.,av.) e número da residência)" />
+                </div>
+                <div class="col-md-4 mb-2 " style="margin-left: 10px; margin-top: 10px">
+                    <label for="Residencia">Tipo de Residência</label>
+                    <input th:field="*{tipo_de_residencia}" type="text" class="form-control" id="residencia" placeholder="Tipo de Residência" />
+                </div>
+                <div class="col-md-3 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="bairro">Bairro</label>
+                    <input th:field="*{bairro}" name="bairro" type="text" class="form-control" id="bairro" placeholder="Bairro" />
+                </div>
+                <div class="col-md-3 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="bairro">Bairro Oficial</label>
+                    <input th:field="*{bairro_oficial}" name="bairroOficial"  type="text" class="form-control" id="bairroOficial" placeholder="Bairro" />
+                </div>
+                <div class="col-md-3 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="municipio">Município</label>
+                    <input th:field="*{municipio}" name="cidade"  type="text" class="form-control" id="cidade" placeholder="Município" />
+                </div>
+               
+                <div class="col-md-2 mb-2" style="margin-left: 10px; margin-top: 10px">
+                    <label for="zonaDaCidade">Zona da Cidade</label>
+                    <input th:field="*{zona_da_cidade}" type="text" class="form-control" id="zonaCidade" placeholder="ZONA DA CIDADE" />
+                </div>
+            </div>
+            <hr/>
+            <h4 style="color: green">Dados De Eleitor</h4>
+            <div class="form-row border rounded">
+                <div class="col-md-2 mb-3" style="margin-left: 10px; margin-top: 10px">
+                    <label for="titulo_de_eleitor">Título de Eleitor</label>
+                    <input th:field="*{titulo_de_eleitor}" type="text" class="form-control" id="telefone" placeholder="Número do Título" />
+                </div>
+                <div class="col-md-2 mb-3" style="margin-left: 10px; margin-top: 10px">
+                    <label for="zona">Zona Eleitoral</label>
+                    <input th:field="*{zona}" type="text" class="form-control" id="telefone" placeholder="Zona Eleitoral" />
+                </div>
+                <div class="col-md-2 mb-3"style="margin-left: 10px; margin-top: 10px">
+                    <label for="secao">Seção Eleitoral</label>
+                    <input th:field="*{secao}" type="text" class="form-control" id="telefone" placeholder="Seção Eleitoral" />
+                </div>
+                <div class="col-md-4 mb-3" style="margin-left: 10px; margin-top: 10px">
+                    <label for="domicilio_eleitoral">Domicílio Eleitoral</label>
+                    <input th:field="*{domicilio_eleitoral}" type="text" class="form-control" id="telefone" placeholder="Domicílio Eleitoral" />
+                </div>
+                <div class="col-md-4 mb-3"style="margin-left: 10px; margin-top: 10px">
+                    <label for="situacao_tse">Situação no TSE</label>
+                    <input th:field="*{situacao_tse}" type="text" class="form-control" id="telefone" placeholder="Situação Eleitoral no TSE" />
+                </div>
+                <div class="col-md-5 mb-3" style="margin-left: 10px; margin-top: 10px">
+                    <label for="local_de_votacao">Local da Votação</label>
+                    <input th:field="*{local_de_votacao}" type="text" class="form-control" id="telefone" placeholder="Local da Votação" />
+                </div>
+
+            </div>
+            <hr/>
+            <h4 style="color: green">Códigos de Cadastro</h4>
+            <div  class="form-row border rounded"  >
+                <div class="form-row">
+
+                    <div class="custom-control custom-checkbox custom-control-inline" style="margin-left: 20px; margin-top: 20px">
+                        <input th:field="*{cod_cliente.codigo1}" type="checkbox" class="custom-control-input" id="customCheck1">
+                        <label class="custom-control-label" for="customCheck1">CÓDIGO 01</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox custom-control-inline" style="margin-left: 20px; margin-top: 20px">
+                        <input th:field="*{cod_cliente.codigo2}" type="checkbox" class="custom-control-input" id="customCheck2">
+                        <label class="custom-control-label" for="customCheck2">CÓDIGO 02</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox custom-control-inline" style="margin-left: 20px; margin-top: 20px">
+                        <input th:field="*{cod_cliente.codigo3}" type="checkbox" class="custom-control-input" id="customCheck3">
+                        <label class="custom-control-label" for="customCheck3">CÓDIGO 03</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox custom-control-inline" style="margin-left: 20px; margin-top: 20px">
+                        <input th:field="*{cod_cliente.codigo4}" type="checkbox" class="custom-control-input" id="customCheck4">
+                        <label class="custom-control-label" for="customCheck4">CÓDIGO 04</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox" style="margin-left: 20px; margin-top: 20px">
+                        <input th:field="*{cod_cliente.codigo5}" type="checkbox" class="custom-control-input" id="customCheck5">
+                        <label class="custom-control-label" for="customCheck5">CÓDIGO 05</label>
+                    </div>
+                    <br/>
+                    <br/>
+                </div>
+
+                <div class="form-row">
+
+                    <div class="custom-control custom-checkbox custom-control-inline" style="margin-left: 20px; margin-top: 20px">
+                        <input th:field="*{cod_cliente.codigo6}" type="checkbox" class="custom-control-input" id="customCheck6">
+                        <label class="custom-control-label" for="customCheck6">CÓDIGO 06</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox custom-control-inline" style="margin-left: 20px; margin-top: 20px">
+                        <input th:field="*{cod_cliente.codigo7}" type="checkbox" class="custom-control-input" id="customCheck7">
+                        <label class="custom-control-label" for="customCheck7">CÓDIGO 07</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox custom-control-inline" style="margin-left: 20px; margin-top: 20px">
+                        <input th:field="*{cod_cliente.codigo8}" type="checkbox" class="custom-control-input" id="customCheck8">
+                        <label class="custom-control-label" for="customCheck8">CÓDIGO 08</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox custom-control-inline" style="margin-left: 20px; margin-top: 20px">
+                        <input th:field="*{cod_cliente.codigo9}" type="checkbox" class="custom-control-input" id="customCheck9">
+                        <label class="custom-control-label" for="customCheck9">CÓDIGO 09</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox" style="margin-left: 20px; margin-top: 20px">
+                        <input th:field="*{cod_cliente.codigo10}" type="checkbox" class="custom-control-input" id="customCheck10">
+                        <label class="custom-control-label" for="customCheck10">CÓDIGO 10</label>
+                    </div>
+
+                    <br/>
+                    <br/>
+                </div>
+
+                <div class="form-row">
+
+                    <div class="custom-control custom-checkbox custom-control-inline" style="margin-left: 20px; margin-top: 20px">
+                        <input th:field="*{cod_cliente.codigo11}" type="checkbox" class="custom-control-input" id="customCheck11">
+                        <label class="custom-control-label" for="customCheck11">CÓDIGO 11</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox custom-control-inline" style="margin-left: 20px; margin-top: 20px">
+                        <input th:field="*{cod_cliente.codigo12}" type="checkbox" class="custom-control-input" id="customCheck12">
+                        <label class="custom-control-label" for="customCheck12">CÓDIGO 12</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox custom-control-inline" style="margin-left: 20px; margin-top: 20px">
+                        <input th:field="*{cod_cliente.codigo13}" type="checkbox" class="custom-control-input" id="customCheck13">
+                        <label class="custom-control-label" for="customCheck13">CÓDIGO 13</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox custom-control-inline" style="margin-left: 20px; margin-top: 20px">
+                        <input th:field="*{cod_cliente.codigo14}" type="checkbox" class="custom-control-input" id="customCheck14">
+                        <label class="custom-control-label" for="customCheck14">CÓDIGO 14</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox" style="margin-left: 20px; margin-top: 20px; margin-bottom: 20px">
+                        <input th:field="*{cod_cliente.codigo15}" type="checkbox" class="custom-control-input" id="customCheck15">
+                        <label class="custom-control-label" for="customCheck15">CÓDIGO 15</label>
+                    </div>
+
+                </div>
+
+            </div>
+            <hr/>
+            <div style="float: right">
+            
+                <a class="btn btn-primary" href="/pessoa/listar" >Voltar</a>
+                <button class="btn btn-success" type="submit">Salvar</button>
+                <br/>
+                <br/>
+
+            </div>
+
+        </form>
+    </div>
+
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>
